@@ -1,0 +1,120 @@
+{
+  "variables": {
+    "cloud_token":"{{env `ATLAS_TOKEN`}}",
+    "vm_name": "Alpine-virt-3.8.1-x86_64",
+    "iso_url": "http://dl-cdn.alpinelinux.org/alpine/v3.8/releases/x86_64/alpine-virt-3.8.1-x86_64.iso",
+    "iso_checksum": "83ede521b174d99a0975c3653e7310b58075fa68fb773ed6995b974a44df60ce",
+    "iso_checksum_type": "sha256",
+    "cpu": "x86_64",
+    "virtualbox_guest_os_type": "Linux_64",
+    "hard_drive_interface":"sata",
+    "hard_drive_nonrotational": "true",
+    "disk_size": "1024",
+    "mem_size": "96",
+    "cpuexecutioncap": "40",
+    "audio": "none",
+    "accelerate2d": "off",
+    "accelerate3d": "off",
+    "usb": "off",
+    "vrde": "off",
+    "acpi": "on",
+    "ssh_username": "root",
+    "ssh_password": "vagrant",
+    "root_password": "vagrant",
+    "vagrant_username": "vagrant",
+    "vagrant_password": "vagrant",
+    "box_version": "0.0.7",
+    "headless": "true"
+  },
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "boot_wait": "10s",
+      "disk_size": "{{user `disk_size`}}",
+      "guest_os_type": "{{user `virtualbox_guest_os_type`}}",
+      "iso_url": "{{user `iso_url`}}" ,
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "ssh_username": "{{user `ssh_username`}}",
+      "ssh_password": "{{user `ssh_password`}}",
+      "ssh_port": 22,
+      "ssh_wait_timeout": "10000s",
+      "shutdown_command": "poweroff",
+      "guest_additions_mode": "disable",
+      "virtualbox_version_file": ".vbox_version",
+      "output_directory": "output/{{user `vm_name`}}-v{{user `box_version`}}-virtualbox",
+      "vm_name": "{{user `vm_name`}}-{{user `variant`}}",
+      "headless": "{{user `headless`}}",
+      "hard_drive_interface": "{{user `hard_drive_interface`}}",
+      "hard_drive_nonrotational": "{{user `hard_drive_nonrotational`}}",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--memory", "{{user `mem_size`}}"],
+        ["modifyvm", "{{.Name}}", "--cpus", "1"],
+        ["modifyvm", "{{.Name}}", "--rtcuseutc", "on"],
+        ["modifyvm", "{{.Name}}", "--usb", "{{user `usb`}}"],
+        ["modifyvm", "{{.Name}}", "--vrde", "{{user `vrde`}}"],
+        ["modifyvm", "{{.Name}}", "--acpi", "{{user `acpi`}}"],
+        ["modifyvm", "{{.Name}}", "--audio", "{{user `audio`}}"],
+        ["modifyvm", "{{.Name}}", "--cpuexecutioncap", "{{user `cpuexecutioncap`}}"],
+        ["modifyvm", "{{.Name}}", "--floppy", "disabled"],
+        ["modifyvm", "{{.Name}}", "--chipset", "piix3"]
+      ],
+      "http_directory": ".",
+      "boot_command": [
+        "root<enter><wait>",
+        "ifconfig eth0 up && udhcpc -i eth0<enter><wait3>",
+        "wget -O /tmp/answers.txt http://{{ .HTTPIP }}:{{ .HTTPPort }}/answers.txt<enter><wait>",
+        "setup-alpine -f /tmp/answers.txt<enter><wait>",
+        "{{user `root_password`}}<enter><wait>",
+        "{{user `root_password`}}<enter><wait>",
+        "<wait10><wait10><wait10>",
+        "y<enter>",
+        "<wait10><wait10><wait10><wait10><wait10><wait10>",
+        "wget -O /tmp/install.sh http://{{ .HTTPIP }}:{{ .HTTPPort }}/install.sh<enter><wait>",
+        "sh /tmp/install.sh<enter><wait>"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+        "../provisioners/base_settings.sh",
+        "../provisioners/vagrant.sh"
+      ],
+      "environment_vars": [
+        "ROOT_PASSWORD={{user `root_password`}}",
+        "VAGRANT_USERNAME={{user `vagrant_username`}}",
+        "VAGRANT_PASSWORD={{user `vagrant_password`}}"
+      ]
+    },
+    {
+      "type": "shell",
+      "start_retry_timeout": "5m",
+      "only": ["virtualbox-iso"],
+      "scripts": [
+        "../provisioners/disk_cleanup.sh"
+      ]
+    },
+    {
+      "type": "shell",
+      "scripts": [
+        "../provisioners/cleanup.sh"
+      ]
+    }
+  ],
+  "post-processors": [
+   [ {
+      "type": "vagrant",
+      "compression_level": 9,
+      "output": "./{{user `vm_name`}}.box",
+      "vagrantfile_template": "../vagrantfiles/Vagrantfile"
+    },
+    {
+      "type": "vagrant-cloud",
+      "box_tag": "eugene_panin/alpine-3.8.1",
+      "access_token": "{{user `cloud_token`}}",
+      "version": "{{user `box_version`}}"
+    }]
+  ]
+}
