@@ -1,5 +1,7 @@
 #!/bin/sh
-echo "$(date): Filling the remaining disk space with 0x00.  This will take long (appr. 15 minutes per 100GB)."
+
+echo "$(date +%H:%M:%S): Fills the remaining 0x00 disk space.  This will take a long time (approximately 15 minutes per 100 GB)."
 sudo dd if=/dev/zero of=/tmp/zero.bin
 sudo rm /tmp/zero.bin
-echo "$(date): Disk cleanup completed."
+echo ""
+echo "$(date +%H:%M:%S): Disk cleanup completed."

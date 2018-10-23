@@ -1,12 +1,18 @@
 {
   "variables": {
+    
+    "author_name":"{{env `AUTHOR_NAME`}}",
+    "support_email":"{{env `AUTHOR_EMAIL`}}",
+    "os_name":"Alpine Linux",
+    "os_version":"3.8.1",
+    "arch": "x86_64",
+    "box_version": "0.1.0",
+    "image_version":"alpine-virt",
+
     "cloud_token":"{{env `ATLAS_TOKEN`}}",
-    "vm_name": "Alpine-virt-3.8.1-x86_64",
-    "iso_url": "http://dl-cdn.alpinelinux.org/alpine/v3.8/releases/x86_64/alpine-virt-3.8.1-x86_64.iso",
-    "iso_checksum": "83ede521b174d99a0975c3653e7310b58075fa68fb773ed6995b974a44df60ce",
-    "iso_checksum_type": "sha256",
-    "cpu": "x86_64",
     "virtualbox_guest_os_type": "Linux_64",
+    "iso_checksum_type": "sha256",
+
     "hard_drive_interface":"sata",
     "hard_drive_nonrotational": "true",
     "disk_size": "1024",
@@ -18,22 +24,23 @@
     "usb": "off",
     "vrde": "off",
     "acpi": "on",
+    
     "ssh_username": "root",
     "ssh_password": "vagrant",
     "root_password": "vagrant",
     "vagrant_username": "vagrant",
     "vagrant_password": "vagrant",
-    "box_version": "0.0.7",
     "headless": "true"
   },
   "builders": [
     {
       "type": "virtualbox-iso",
+      "vm_name": "{{user `os_name`}}-{{user `os_version`}}-{{user `arch`}}",
+      "guest_os_type": "{{user `virtualbox_guest_os_type`}}",
       "boot_wait": "10s",
       "disk_size": "{{user `disk_size`}}",
-      "guest_os_type": "{{user `virtualbox_guest_os_type`}}",
-      "iso_url": "{{user `iso_url`}}" ,
-      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_url": "http://dl-cdn.alpinelinux.org/alpine/v3.8/releases/{{user `arch`}}/{{user `image_version`}}-{{user `os_version`}}-{{user `arch`}}.iso",
+      "iso_checksum_url": "http://dl-cdn.alpinelinux.org/alpine/v3.8/releases/{{user `arch`}}/{{user `image_version`}}-{{user `os_version`}}-{{user `arch`}}.iso.sha256",
       "iso_checksum_type": "{{user `iso_checksum_type`}}",
       "ssh_username": "{{user `ssh_username`}}",
       "ssh_password": "{{user `ssh_password`}}",
@@ -42,8 +49,7 @@
       "shutdown_command": "poweroff",
       "guest_additions_mode": "disable",
       "virtualbox_version_file": ".vbox_version",
-      "output_directory": "output/{{user `vm_name`}}-v{{user `box_version`}}-virtualbox",
-      "vm_name": "{{user `vm_name`}}-{{user `variant`}}",
+      "output_directory": "output/{{user `os_name`}}-{{user `os_version`}}-{{user `arch`}}-v{{user `box_version`}}-virtualbox",
       "headless": "{{user `headless`}}",
       "hard_drive_interface": "{{user `hard_drive_interface`}}",
       "hard_drive_nonrotational": "{{user `hard_drive_nonrotational`}}",
@@ -59,7 +65,7 @@
         ["modifyvm", "{{.Name}}", "--floppy", "disabled"],
         ["modifyvm", "{{.Name}}", "--chipset", "piix3"]
       ],
-      "http_directory": ".",
+      "http_directory": "http",
       "boot_command": [
         "root<enter><wait>",
         "ifconfig eth0 up && udhcpc -i eth0<enter><wait3>",
@@ -83,9 +89,16 @@
         "../provisioners/vagrant.sh"
       ],
       "environment_vars": [
+        "AUTHOR_NAME={{user `author_name`}}",
+        "AUTHOR_EMAIL={{user `support_email`}}",
         "ROOT_PASSWORD={{user `root_password`}}",
         "VAGRANT_USERNAME={{user `vagrant_username`}}",
-        "VAGRANT_PASSWORD={{user `vagrant_password`}}"
+        "VAGRANT_PASSWORD={{user `vagrant_password`}}",
+        "BOX_VERSION={{user `box_version`}}",
+        "OS_NAME={{user `os_name`}}",
+        "OS_VERSION={{user `os_version`}}",
+        "OS_ARCH={{user `arch`}}",
+        "IMAGE_VERSION={{user `image_version`}}"
       ]
     },
     {
@@ -107,7 +120,7 @@
    [ {
       "type": "vagrant",
       "compression_level": 9,
-      "output": "./{{user `vm_name`}}.box",
+      "output": "./{{user `os_name`}}-{{user `os_version`}}-{{user `arch`}}.box",
       "vagrantfile_template": "../vagrantfiles/Vagrantfile"
     },
     {

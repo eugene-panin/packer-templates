@@ -1,4 +1,5 @@
 #!/bin/sh -ex
+
 mount -t ext4 /dev/sda3 /mnt
 apk add --root=/mnt openssl
 apk add --root=/mnt sudo

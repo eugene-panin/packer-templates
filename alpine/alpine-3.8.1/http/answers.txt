@@ -11,7 +11,7 @@ iface eth0 inet dhcp
 DNSOPTS="8.8.8.8"
 TIMEZONEOPTS="-z Europe/Moscow"
 PROXYOPTS="none"
-APKREPOSOPTS="https://mirror.yandex.ru/mirrors/alpine/v3.8/main"
+APKREPOSOPTS="http://dl-cdn.alpinelinux.org/alpine/v3.8/main/"
 SSHDOPTS="-c none"
 NTPOPTS="-c chrony"
 DISKOPTS="-m sys /dev/sda"
