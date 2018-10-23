@@ -38,3 +38,10 @@ $ packer build alpine-3.8.1.json
 > $ vagrant up
 > ```
 
+2. Also you can add your box from local path (into you build project) by following the commands below
+> ```sh
+> $ vagrant box add Alpine Linux-3.8.1-x86_64.box --name [your_box_name]
+> $ mkdir [your_dir_name] && cd [your_dir_name]
+> $ vagrant init [your_account_name]/alpine-3.8.1
+> $ vagrant up
+> ```
