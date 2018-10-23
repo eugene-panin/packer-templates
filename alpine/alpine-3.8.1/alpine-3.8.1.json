@@ -6,8 +6,10 @@
     "os_name":"Alpine Linux",
     "os_version":"3.8.1",
     "arch": "x86_64",
-    "box_version": "0.1.0",
+    "box_version": "0.1.1",
     "image_version":"alpine-virt",
+    "box_name": "alpine",
+    "atlas_user":"{{env `ATLAS_USER`}}",
 
     "cloud_token":"{{env `ATLAS_TOKEN`}}",
     "virtualbox_guest_os_type": "Linux_64",
@@ -125,7 +127,7 @@
     },
     {
       "type": "vagrant-cloud",
-      "box_tag": "eugene_panin/alpine-3.8.1",
+      "box_tag": "{{user `atlas_user`}}/{{user `box_name`}}-{{user `os_version`}}",
       "access_token": "{{user `cloud_token`}}",
       "version": "{{user `box_version`}}"
     }]

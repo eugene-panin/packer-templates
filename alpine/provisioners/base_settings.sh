@@ -9,17 +9,17 @@ echo ""
 echo "$(date +%H:%M:%S): Changing /etc/motd..."
 echo ""
 cat << EOF > /etc/motd
- -------------------------------------------
-| OS: $OS_NAME                   
+ -------------------------------------------------------------
+| OS: $OS_NAME                                                
 | Version: $OS_VERSION           
 | Image version: $IMAGE_VERSION
 | Arch: $OS_ARCH
 | Box version: $BOX_VERSION
 | Release date: $(date)
- -------------------------------------------
-| Author: §AUTHOR_NAME
+ -------------------------------------------------------------
+| Author: $AUTHOR_NAME
 | Support email: $AUTHOR_EMAIL
- -------------------------------------------
+ -------------------------------------------------------------
     Box for development environment, enjoy! :)
 
 
